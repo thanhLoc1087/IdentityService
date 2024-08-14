@@ -14,15 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.loc.identity_service.dto.request.UserCreationRequest;
 import com.loc.identity_service.dto.request.UserUpdateRequest;
+import com.loc.identity_service.dto.response.ApiResponse;
 import com.loc.identity_service.entity.User;
 import com.loc.identity_service.service.UserService;
 
 import jakarta.validation.Valid;
-
-
-
-
-
 
 @RestController
 @RequestMapping("/users")
@@ -42,8 +38,10 @@ public class UserController {
     
     
     @PostMapping
-    public User createUser(@RequestBody @Valid UserCreationRequest request) {
-        return userService.createUser(request);
+    public ApiResponse<User> createUser(@RequestBody @Valid UserCreationRequest request) {
+        ApiResponse<User> response = new ApiResponse<>();
+        response.setResult(userService.createUser(request));
+        return response;
     }    
 
     @PutMapping("/{userId}")

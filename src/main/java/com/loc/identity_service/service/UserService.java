@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import com.loc.identity_service.dto.request.UserCreationRequest;
 import com.loc.identity_service.dto.request.UserUpdateRequest;
 import com.loc.identity_service.entity.User;
+import com.loc.identity_service.exception.AppException;
+import com.loc.identity_service.exception.ErrorCode;
 import com.loc.identity_service.repository.UserRepository;
 
 @Service
@@ -21,7 +23,7 @@ public class UserService {
 
     public User getUser(String id) {
         return userRepository.findById(id).orElseThrow(
-            () -> new RuntimeException("User not found")
+            () -> new AppException(ErrorCode.USER_EXISTS)
         );
     }
 
