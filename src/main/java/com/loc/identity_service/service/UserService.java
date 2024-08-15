@@ -2,6 +2,8 @@ package com.loc.identity_service.service;
 
 import java.util.List;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.loc.identity_service.dto.request.UserCreationRequest;
@@ -39,6 +41,8 @@ public class UserService {
             throw new AppException(ErrorCode.USER_EXISTS);
         
         User user = userMapper.toUser(request);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
