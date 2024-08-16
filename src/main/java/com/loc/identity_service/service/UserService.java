@@ -2,6 +2,10 @@ package com.loc.identity_service.service;
 
 import java.util.List;
 import java.util.HashSet;
+
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +33,9 @@ public class UserService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
 
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getUsers() {
+        log.info("In method getUser of UserService");
         return userRepository
             .findAll()
             .stream()
@@ -37,10 +43,25 @@ public class UserService {
             .toList();
     }
 
+    @PostAuthorize("returnObject.username == authentication.name || hasRole('ADMIN')")
     public UserResponse getUser(String id) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info(authentication.getName());
+        log.info("In method getUser of UserService");
         return userMapper.toUserResponse(userRepository.findById(id).orElseThrow(
             () -> new AppException(ErrorCode.USER_EXISTS)
         ));
+    }
+
+    public UserResponse getMyInfo() {
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+
+        User user = userRepository
+            .findByUsername(name)
+            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTS));
+        
+        return userMapper.toUserResponse(user);
     }
 
     public UserResponse createUser(UserCreationRequest request) {
