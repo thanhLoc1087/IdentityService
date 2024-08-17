@@ -1,34 +1,30 @@
 package com.loc.identity_service.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+
+import lombok.Getter;
+
+@Getter
 public enum ErrorCode {
-    UNCATEGORIZED(9999, "Uncategorized error."),
-    INVALID_KEY(8888, "Invalid message key."),
-    USER_EXISTS(1001, "User already exists."),
-    USER_NOT_EXISTS(1002, "User does not exist."),
-    USERNAME_INVALID(1003, "Username must have at least 3 characters."),
-    PASSWORD_INVALID(1004, "Password must have at least 8 characters."),
-    UNAUTHENTICATED(1005, "User unathenticated."),
+    UNCATEGORIZED(9999, "Uncategorized error.", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_KEY(8888, "Invalid message key.", HttpStatus.BAD_REQUEST),
+    USER_NOT_EXISTS(1001, "User does not exist.", HttpStatus.NOT_FOUND),
+    USER_EXISTS(1002, "User already exists.", HttpStatus.BAD_REQUEST),
+    USERNAME_INVALID(1003, "Username must have at least 3 characters.", HttpStatus.BAD_REQUEST),
+    PASSWORD_INVALID(1004, "Password must have at least 8 characters.", HttpStatus.BAD_REQUEST),
+    UNAUTHENTICATED(1005, "Unathenticated.", HttpStatus.UNAUTHORIZED),
+    UNAUTHORIZED(1007, "You shall not proceed since You do not have access.", HttpStatus.FORBIDDEN),
     ;
 
-    ErrorCode(int code, String message) {
+    ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
+        this.statusCode = statusCode;
         this.message = message;
     }
 
     private int code;
+    private HttpStatusCode statusCode;
     private String message;
-    
-    public int getCode() {
-        return code;
-    }
-    public void setCode(int code) {
-        this.code = code;
-    }
-    public String getMessage() {
-        return message;
-    }
-    public void setMessage(String message) {
-        this.message = message;
-    }
 
 }

@@ -3,6 +3,7 @@ package com.loc.identity_service.exception;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,29 +14,43 @@ import com.loc.identity_service.dto.response.ApiResponse;
 public class GlobalExceptionHandler {
     
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ApiResponse> handlingRuntimeException(Exception exception) {
+    public ResponseEntity<ApiResponse<String>> handlingRuntimeException(Exception exception) {
         ErrorCode errorCode = ErrorCode.UNCATEGORIZED;
-        ApiResponse response = new ApiResponse<>();
+        ApiResponse<String> response = new ApiResponse<>();
         response.setCode(errorCode.getCode());
         response.setMessage(exception.getMessage());
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(value = AppException.class)
-    public ResponseEntity<ApiResponse> handlingAppException(AppException exception) {
+    public ResponseEntity<ApiResponse<String>> handlingAppException(AppException exception) {
         ErrorCode errorCode = exception.getErrorCode();
-        ApiResponse response = new ApiResponse<>();
+        ApiResponse<String> response = new ApiResponse<>();
         response.setCode(errorCode.getCode());
         response.setMessage(errorCode.getMessage());
-        return ResponseEntity.badRequest().body(response);
+        return ResponseEntity
+            .status(errorCode.getStatusCode())
+            .body(response);
     }
 
-    @SuppressWarnings("null")
+    @ExceptionHandler(value=AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<String>> handlingAccessDeniedException(AccessDeniedException exception) {
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
+        return ResponseEntity
+            .status(errorCode.getStatusCode())
+            .body(
+                ApiResponse.<String>builder()
+                    .code(errorCode.getCode())
+                    .message(errorCode.getMessage())
+                    .build()
+            );
+    }
+
     @ExceptionHandler(value=MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse> handlingValidation(MethodArgumentNotValidException exception) {
+    public ResponseEntity<ApiResponse<String>> handlingValidation(MethodArgumentNotValidException exception) {
         String enumKey = Optional.ofNullable(
                 exception.getFieldError().getDefaultMessage()
-            ).orElse("UNCATEGORIZED.");
+            ).orElse(ErrorCode.UNCATEGORIZED.name());
         ErrorCode errorCode = ErrorCode.INVALID_KEY;
         try {
             errorCode = ErrorCode.valueOf(enumKey);
@@ -43,7 +58,7 @@ public class GlobalExceptionHandler {
             //Error
         }
 
-        ApiResponse response = new ApiResponse<>();
+        ApiResponse<String> response = new ApiResponse<>();
         response.setCode(errorCode.getCode());
         response.setMessage(errorCode.getMessage());
 

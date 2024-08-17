@@ -19,8 +19,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.loc.identity_service.enums.Role;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -31,9 +29,9 @@ public class SecurityConfig {
         "/auth/introspect",
     };
 
-    private final String[] ADMIN_ENDPOINTS = {
-        "/users",
-    };
+    // private final String[] ADMIN_ENDPOINTS = {
+    //     "/users",
+    // };
     
     @Value("${jwt.signedKey}")
     private String signedKey;
@@ -54,6 +52,7 @@ public class SecurityConfig {
                 jwtConfigurer
                     .decoder(jwtDecoder())
                     .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                    .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
         );
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
