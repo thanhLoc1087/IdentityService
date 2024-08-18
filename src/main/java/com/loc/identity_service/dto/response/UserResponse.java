@@ -3,8 +3,6 @@ package com.loc.identity_service.dto.response;
 import java.time.LocalDate;
 import java.util.Set;
 
-import com.loc.identity_service.entity.Role;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,5 +21,6 @@ public class UserResponse {
     String firstName;
     String lastName;
     LocalDate dob;
-    Set<Role> roles;
+
+    Set<RoleResponse> roles;
 }

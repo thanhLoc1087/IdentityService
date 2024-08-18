@@ -30,7 +30,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserController {
     UserService userService;
-
+    
+    @PostMapping
+    public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
+        ApiResponse<UserResponse> response = new ApiResponse<>();
+        response.setResult(userService.createUser(request));
+        return response;
+    }    
+    
     @GetMapping
     public ApiResponse<List<UserResponse>> getUsers() {
         return ApiResponse.<List<UserResponse>>builder() 
@@ -51,16 +58,9 @@ public class UserController {
             .result(userService.getMyInfo()) 
             .build();
     }
-    
-    @PostMapping
-    public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
-        ApiResponse<UserResponse> response = new ApiResponse<>();
-        response.setResult(userService.createUser(request));
-        return response;
-    }    
 
     @PutMapping("/{userId}")
-    public UserResponse putMethodName(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
+    public UserResponse updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
         return userService.updateUser(userId, request);
     }
 

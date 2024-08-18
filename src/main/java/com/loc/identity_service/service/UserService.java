@@ -9,14 +9,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.loc.identity_service.constant.PredefinedRoles;
 import com.loc.identity_service.dto.request.UserCreationRequest;
 import com.loc.identity_service.dto.request.UserUpdateRequest;
 import com.loc.identity_service.dto.response.UserResponse;
+import com.loc.identity_service.entity.Role;
 import com.loc.identity_service.entity.User;
-import com.loc.identity_service.enums.Role;
 import com.loc.identity_service.exception.AppException;
 import com.loc.identity_service.exception.ErrorCode;
 import com.loc.identity_service.mapper.UserMapper;
+import com.loc.identity_service.repository.RoleRepository;
 import com.loc.identity_service.repository.UserRepository;
 
 import lombok.AccessLevel;
@@ -31,7 +33,27 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService {
     UserMapper userMapper;
     UserRepository userRepository;
+    RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
+
+    public UserResponse createUser(UserCreationRequest request) {
+        if (userRepository.existsByUsername(request.getUsername()))
+            throw new AppException(ErrorCode.USER_EXISTS);
+        
+        User user = userMapper.toUser(request);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        HashSet<Role> roles = new HashSet<>();
+        roles.add(PredefinedRoles.USER);
+        user.setRoles(roles);
+        
+        var roleNames = new HashSet<>(roleRepository.findAllById(request.getRoles()));
+        roleNames.add(PredefinedRoles.USER);
+
+        user.setRoles(roleNames);
+
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
 
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getUsers() {
@@ -64,24 +86,15 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    public UserResponse createUser(UserCreationRequest request) {
-        if (userRepository.existsByUsername(request.getUsername()))
-            throw new AppException(ErrorCode.USER_EXISTS);
-        
-        User user = userMapper.toUser(request);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.USER.name());
-        // user.setRoles(roles);
-
-        return userMapper.toUserResponse(userRepository.save(user));
-    }
-
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_EXISTS));
+
         userMapper.updateUser(user, request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        var roles = roleRepository.findAllById(request.getRoles());
+
+        user.setRoles(new HashSet<>(roles));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }

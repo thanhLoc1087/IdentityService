@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.loc.identity_service.constant.PredefinedRoles;
 import com.loc.identity_service.entity.Role;
 import com.loc.identity_service.entity.User;
 import com.loc.identity_service.repository.UserRepository;
@@ -14,6 +15,7 @@ import com.loc.identity_service.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration
@@ -23,17 +25,23 @@ import lombok.extern.slf4j.Slf4j;
 public class ApplicationInnitConfig {
 
     PasswordEncoder passwordEncoder;
+    
+    @NonFinal
+    static final String ADMIN_USER_NAME = "admin";
+
+    @NonFinal
+    static final String ADMIN_PASSWORD = "admin";
 
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository) {
         return args -> {
             if (userRepository.findByUsername("admin").isEmpty()) {
                 var roles = new HashSet<Role>();
-                // roles.add(Role.ADMIN.name());
+                roles.add(PredefinedRoles.ADMIN);
 
                 User admin = User.builder()
-                    .username("admin")
-                    .password(passwordEncoder.encode("admin"))
+                    .username(ADMIN_USER_NAME)
+                    .password(passwordEncoder.encode(ADMIN_PASSWORD))
                     .roles(roles)
                     .build();
 

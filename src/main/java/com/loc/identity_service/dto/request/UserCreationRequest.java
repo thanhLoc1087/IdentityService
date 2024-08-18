@@ -1,6 +1,7 @@
 package com.loc.identity_service.dto.request;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -23,5 +24,7 @@ public class UserCreationRequest {
     String password;
     String firstName;
     String lastName;
+
+    List<String> roles;
     LocalDate dob;
 }
