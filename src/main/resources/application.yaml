@@ -20,4 +20,6 @@ logging:
         security: DEBUG
         
 jwt:
-    signerKey: "xZr5iS8whFOkv0+DqsMTGTOJdlIWEMhsLS9x6OBTj/bK0GUsXRp0qTs/svpbfqz8"
+    signer-key: "xZr5iS8whFOkv0+DqsMTGTOJdlIWEMhsLS9x6OBTj/bK0GUsXRp0qTs/svpbfqz8"
+    valid-duration: 5 #in seconds
+    refreshable-duration: 120 #in seconds
