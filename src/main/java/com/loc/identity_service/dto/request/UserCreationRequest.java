@@ -3,6 +3,8 @@ package com.loc.identity_service.dto.request;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.loc.identity_service.validator.DateOfBirthConstraint;
+
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,7 +19,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level=AccessLevel.PRIVATE)
 public class UserCreationRequest {
-    @Size(min=3, message="USERNAME_INVcALID")
+    @Size(min=3, message="USERNAME_INVALID")
     String username;
 
     @Size(min=8, message="PASSWORD_INVALID")
@@ -26,5 +28,7 @@ public class UserCreationRequest {
     String lastName;
 
     List<String> roles;
+
+    @DateOfBirthConstraint(min = 6, message="INVALID_DOB")
     LocalDate dob;
 }
