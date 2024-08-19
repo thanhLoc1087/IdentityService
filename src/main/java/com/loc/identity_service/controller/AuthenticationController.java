@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.loc.identity_service.dto.request.AuthenticationRequest;
 import com.loc.identity_service.dto.request.IntrospectRequest;
+import com.loc.identity_service.dto.request.LogoutRequest;
 import com.loc.identity_service.dto.response.ApiResponse;
 import com.loc.identity_service.dto.response.AuthenticationResponse;
 import com.loc.identity_service.dto.response.IntrospectResponse;
@@ -42,6 +43,14 @@ public class AuthenticationController {
         IntrospectResponse result = authenticationService.introspect(request);
         return ApiResponse.<IntrospectResponse>builder()
             .result(result)
+            .build();
+    }
+    
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(@RequestBody LogoutRequest request)
+    throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder()
             .build();
     }
     
