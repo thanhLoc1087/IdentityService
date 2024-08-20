@@ -1,6 +1,6 @@
 package com.loc.identity_service.exception;
 
-public class AppException extends RuntimeException{
+public class AppException extends RuntimeException {
     public AppException(ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
@@ -15,5 +15,4 @@ public class AppException extends RuntimeException{
     public void setErrorCode(ErrorCode errorCode) {
         this.errorCode = errorCode;
     }
-    
 }

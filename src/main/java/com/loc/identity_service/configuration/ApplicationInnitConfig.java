@@ -22,17 +22,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @RequiredArgsConstructor
-@FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
-@ConditionalOnProperty(
-    prefix = "spring",
-    value = "datasource.driverClassName",
-    havingValue = "org.postgresql.Driver"
-)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@ConditionalOnProperty(prefix = "spring", value = "datasource.driverClassName", havingValue = "org.postgresql.Driver")
 @Slf4j
 public class ApplicationInnitConfig {
 
     PasswordEncoder passwordEncoder;
-    
+
     @NonFinal
     static final String ADMIN_USER_NAME = "admin";
 

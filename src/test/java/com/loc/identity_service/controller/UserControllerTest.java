@@ -45,20 +45,20 @@ public class UserControllerTest {
         dob = LocalDate.of(2003, 12, 5);
 
         request = UserCreationRequest.builder()
-            .username("johndoe")
-            .firstName("John")
-            .lastName("Doe")
-            .password("12345678")
-            .dob(dob)
-            .build();
+                .username("johndoe")
+                .firstName("John")
+                .lastName("Doe")
+                .password("12345678")
+                .dob(dob)
+                .build();
 
         userResponse = UserResponse.builder()
-            .id("jk31hkj3h5")
-            .username("johndoe")
-            .firstName("John")
-            .lastName("Doe")
-            .dob(dob)
-            .build();
+                .id("jk31hkj3h5")
+                .username("johndoe")
+                .firstName("John")
+                .lastName("Doe")
+                .dob(dob)
+                .build();
     }
 
     @Test
@@ -68,18 +68,15 @@ public class UserControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         String content = objectMapper.writeValueAsString(request);
 
-        Mockito.when(userService.createUser(ArgumentMatchers.any()))
-            .thenReturn(userResponse);
+        Mockito.when(userService.createUser(ArgumentMatchers.any())).thenReturn(userResponse);
 
         // WHEN, THEN
-        mockMvc.perform(
-            MockMvcRequestBuilders
-                .post("/users")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(content))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath("code").value(1000))
-            .andExpect(MockMvcResultMatchers.jsonPath("result.id").value("jk31hkj3h5"));
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(1000))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.id").value("jk31hkj3h5"));
     }
 
     @Test
@@ -91,17 +88,15 @@ public class UserControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         String content = objectMapper.writeValueAsString(request);
 
-        Mockito.when(userService.createUser(ArgumentMatchers.any()))
-            .thenReturn(userResponse);
+        Mockito.when(userService.createUser(ArgumentMatchers.any())).thenReturn(userResponse);
 
         // WHEN, THEN
-        mockMvc.perform(
-            MockMvcRequestBuilders
-                .post("/users")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(content))
-            .andExpect(MockMvcResultMatchers.status().isBadRequest())
-            .andExpect(MockMvcResultMatchers.jsonPath("code").value(1003))
-            .andExpect(MockMvcResultMatchers.jsonPath("message").value("Username must have at least 4 characters."));
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(1003))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("message").value("Username must have at least 4 characters."));
     }
 }

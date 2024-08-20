@@ -4,28 +4,22 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.loc.identity_service.dto.request.UserCreationRequest;
-import com.loc.identity_service.dto.response.UserResponse;
-import com.loc.identity_service.service.UserService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -45,11 +39,8 @@ public class UserControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-    
-    private UserService userService;
 
     private UserCreationRequest request;
-    private UserResponse userResponse;
     private LocalDate dob;
 
     @BeforeEach
@@ -57,20 +48,12 @@ public class UserControllerIntegrationTest {
         dob = LocalDate.of(2003, 12, 5);
 
         request = UserCreationRequest.builder()
-            .username("johndoe")
-            .firstName("John")
-            .lastName("Doe")
-            .password("12345678")
-            .dob(dob)
-            .build();
-
-        userResponse = UserResponse.builder()
-            .id("jk31hkj3h5")
-            .username("johndoe")
-            .firstName("John")
-            .lastName("Doe")
-            .dob(dob)
-            .build();
+                .username("johndoe")
+                .firstName("John")
+                .lastName("Doe")
+                .password("12345678")
+                .dob(dob)
+                .build();
     }
 
     @Test
@@ -81,15 +64,13 @@ public class UserControllerIntegrationTest {
         String content = objectMapper.writeValueAsString(request);
 
         // WHEN, THEN
-        mockMvc.perform(
-            MockMvcRequestBuilders
-                .post("/users")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(content))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath("code").value(1000))
-            .andExpect(MockMvcResultMatchers.jsonPath("result.username").value("johndoe"))
-            .andExpect(MockMvcResultMatchers.jsonPath("result.firstName").value("John"))
-            .andExpect(MockMvcResultMatchers.jsonPath("result.lastName").value("Doe"));
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(1000))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.username").value("johndoe"))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.firstName").value("John"))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.lastName").value("Doe"));
     }
 }

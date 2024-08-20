@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import jakarta.validation.ConstraintViolation;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,12 +14,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.loc.identity_service.dto.response.ApiResponse;
 
-import jakarta.validation.ConstraintViolation;
-
 @ControllerAdvice
 public class GlobalExceptionHandler {
     private static final String MIN_ATTRIBUTE = "min";
-    
+
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ApiResponse<String>> handlingRuntimeException(Exception exception) {
         ErrorCode errorCode = ErrorCode.UNCATEGORIZED;
@@ -33,48 +33,42 @@ public class GlobalExceptionHandler {
         ApiResponse<String> response = new ApiResponse<>();
         response.setCode(errorCode.getCode());
         response.setMessage(errorCode.getMessage());
-        return ResponseEntity
-            .status(errorCode.getStatusCode())
-            .body(response);
+        return ResponseEntity.status(errorCode.getStatusCode()).body(response);
     }
 
-    @ExceptionHandler(value=AccessDeniedException.class)
+    @ExceptionHandler(value = AccessDeniedException.class)
     public ResponseEntity<ApiResponse<String>> handlingAccessDeniedException(AccessDeniedException exception) {
         ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
-        return ResponseEntity
-            .status(errorCode.getStatusCode())
-            .body(
-                ApiResponse.<String>builder()
-                    .code(errorCode.getCode())
-                    .message(errorCode.getMessage())
-                    .build()
-            );
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ApiResponse.<String>builder()
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
+                        .build());
     }
 
-    @ExceptionHandler(value=MethodArgumentNotValidException.class)
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<String>> handlingValidation(MethodArgumentNotValidException exception) {
-        String enumKey = Optional.ofNullable(
-                exception.getFieldError().getDefaultMessage()
-            ).orElse(ErrorCode.UNCATEGORIZED.name());
+        String enumKey = Optional.ofNullable(exception.getFieldError().getDefaultMessage())
+                .orElse(ErrorCode.UNCATEGORIZED.name());
         ErrorCode errorCode = ErrorCode.INVALID_KEY;
         Map<String, Object> attributes = null;
         try {
             errorCode = ErrorCode.valueOf(enumKey);
 
-            var constraintViolation = exception.getBindingResult()
-                .getAllErrors().getFirst().unwrap(ConstraintViolation.class);
+            var constraintViolation =
+                    exception.getBindingResult().getAllErrors().getFirst().unwrap(ConstraintViolation.class);
             attributes = constraintViolation.getConstraintDescriptor().getAttributes();
-            
+
         } catch (IllegalArgumentException e) {
-            //Error
+            // Error
         }
 
         ApiResponse<String> response = new ApiResponse<>();
         response.setCode(errorCode.getCode());
         response.setMessage(
-            Objects.nonNull(attributes) ?
-                mapAttribute(errorCode.getMessage(), attributes)
-                : errorCode.getMessage());
+                Objects.nonNull(attributes)
+                        ? mapAttribute(errorCode.getMessage(), attributes)
+                        : errorCode.getMessage());
 
         return ResponseEntity.badRequest().body(response);
     }

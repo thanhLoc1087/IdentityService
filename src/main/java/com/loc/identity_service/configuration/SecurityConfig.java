@@ -19,10 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
-        "/users",
-        "/auth/token",
-        "/auth/introspect",
-        "/auth/logout",
+        "/users", "/auth/token", "/auth/introspect", "/auth/logout",
     };
 
     // private final String[] ADMIN_ENDPOINTS = {
@@ -33,23 +30,17 @@ public class SecurityConfig {
     private CustomJwtDecoder customJwtDecoder;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity)
-        throws Exception {
-        httpSecurity.authorizeHttpRequests(request -> 
-            request
-                .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                .permitAll()
                 // .requestMatchers(HttpMethod.GET, ADMIN_ENDPOINTS).hasRole(Role.ADMIN.name())
                 .anyRequest()
-                .authenticated()
-        );
+                .authenticated());
 
-        httpSecurity.oauth2ResourceServer(oauth2 ->
-            oauth2.jwt(jwtConfigurer -> 
-                jwtConfigurer
-                    .decoder(customJwtDecoder)
-                    .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                    .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-        );
+        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
+                        .decoder(customJwtDecoder)
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 

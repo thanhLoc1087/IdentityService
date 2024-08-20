@@ -1,7 +1,7 @@
 package com.loc.identity_service.service;
 
-import java.util.List;
 import java.util.HashSet;
+import java.util.List;
 
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class UserService {
     UserMapper userMapper;
@@ -37,12 +37,11 @@ public class UserService {
     PasswordEncoder passwordEncoder;
 
     public UserResponse createUser(UserCreationRequest request) {
-        if (userRepository.existsByUsername(request.getUsername()))
-            throw new AppException(ErrorCode.USER_EXISTS);
-        
+        if (userRepository.existsByUsername(request.getUsername())) throw new AppException(ErrorCode.USER_EXISTS);
+
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        
+
         var roles = new HashSet<Role>();
         roles.add(PredefinedRoles.USER);
 
@@ -54,11 +53,7 @@ public class UserService {
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getUsers() {
         log.info("In method getUser of UserService");
-        return userRepository
-            .findAll()
-            .stream()
-            .map(userMapper::toUserResponse)
-            .toList();
+        return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
     }
 
     @PostAuthorize("returnObject.username == authentication.name || hasRole('ADMIN')")
@@ -66,19 +61,16 @@ public class UserService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         log.info(authentication.getName());
         log.info("In method getUser of UserService");
-        return userMapper.toUserResponse(userRepository.findById(id).orElseThrow(
-            () -> new AppException(ErrorCode.USER_EXISTS)
-        ));
+        return userMapper.toUserResponse(
+                userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_EXISTS)));
     }
 
     public UserResponse getMyInfo() {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
 
-        User user = userRepository
-            .findByUsername(name)
-            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTS));
-        
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTS));
+
         return userMapper.toUserResponse(user);
     }
 

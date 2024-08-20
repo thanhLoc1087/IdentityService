@@ -7,9 +7,10 @@ import com.loc.identity_service.dto.request.RoleRequest;
 import com.loc.identity_service.dto.response.RoleResponse;
 import com.loc.identity_service.entity.Role;
 
-@Mapper(componentModel="spring")
+@Mapper(componentModel = "spring")
 public interface RoleMapper {
     @Mapping(target = "permissions", ignore = true)
     Role toRole(RoleRequest request);
+
     RoleResponse toRoleResponse(Role role);
 }

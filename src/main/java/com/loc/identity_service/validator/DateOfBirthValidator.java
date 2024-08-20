@@ -1,11 +1,11 @@
 package com.loc.identity_service.validator;
 
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
-
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class DateOfBirthValidator implements ConstraintValidator<DateOfBirthConstraint, LocalDate> {
 
@@ -13,11 +13,10 @@ public class DateOfBirthValidator implements ConstraintValidator<DateOfBirthCons
 
     @Override
     public boolean isValid(LocalDate value, ConstraintValidatorContext context) {
-        if (Objects.isNull(value))
-            return true;
+        if (Objects.isNull(value)) return true;
 
         long years = ChronoUnit.YEARS.between(value, LocalDate.now());
-    
+
         return years >= min;
     }
 
@@ -27,5 +26,4 @@ public class DateOfBirthValidator implements ConstraintValidator<DateOfBirthCons
 
         min = constraintAnnotation.min();
     }
-    
 }

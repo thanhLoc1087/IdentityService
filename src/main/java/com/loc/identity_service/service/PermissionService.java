@@ -1,7 +1,8 @@
 package com.loc.identity_service.service;
 
-import org.springframework.stereotype.Service;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
 
 import com.loc.identity_service.dto.request.PermissionRequest;
 import com.loc.identity_service.dto.response.PermissionResponse;
@@ -17,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PermissionService {
     PermissionRepository permissionRepositoty;
     PermissionMapper permissionMapper;
@@ -31,10 +32,7 @@ public class PermissionService {
 
     public List<PermissionResponse> getAll() {
         var permissions = permissionRepositoty.findAll();
-        return permissions
-            .stream()
-            .map(permissionMapper::toPermissionResponse)
-            .toList();
+        return permissions.stream().map(permissionMapper::toPermissionResponse).toList();
     }
 
     public void delete(String permissionName) {

@@ -2,6 +2,8 @@ package com.loc.identity_service.controller;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +19,6 @@ import com.loc.identity_service.dto.response.ApiResponse;
 import com.loc.identity_service.dto.response.UserResponse;
 import com.loc.identity_service.service.UserService;
 
-import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,37 +27,37 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class UserController {
     UserService userService;
-    
+
     @PostMapping
     public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
         ApiResponse<UserResponse> response = new ApiResponse<>();
         response.setResult(userService.createUser(request));
         return response;
-    }    
-    
+    }
+
     @GetMapping
     public ApiResponse<List<UserResponse>> getUsers() {
-        return ApiResponse.<List<UserResponse>>builder() 
-            .result(userService.getUsers()) 
-            .build();
+        return ApiResponse.<List<UserResponse>>builder()
+                .result(userService.getUsers())
+                .build();
     }
-    
+
     @GetMapping("/{userId}")
     public ApiResponse<UserResponse> getUser(@PathVariable String userId) {
-        return ApiResponse.<UserResponse>builder() 
-            .result(userService.getUser(userId)) 
-            .build();
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getUser(userId))
+                .build();
     }
 
     @GetMapping("/myInfo")
     public ApiResponse<UserResponse> getMyInfo() {
-        return ApiResponse.<UserResponse>builder() 
-            .result(userService.getMyInfo()) 
-            .build();
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getMyInfo())
+                .build();
     }
 
     @PutMapping("/{userId}")

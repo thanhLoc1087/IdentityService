@@ -2,7 +2,6 @@ package com.loc.identity_service.configuration;
 
 import java.text.ParseException;
 import java.util.Objects;
-
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,23 +31,19 @@ public class CustomJwtDecoder implements JwtDecoder {
     public Jwt decode(String token) throws JwtException {
         try {
             var response = authenticationService.introspect(
-                IntrospectRequest.builder().token(token).build()
-            );
-            if (!response.isValid())
-                throw new JwtException("Invalid token.");
-        } catch (JOSEException|ParseException e) {
+                    IntrospectRequest.builder().token(token).build());
+            if (!response.isValid()) throw new JwtException("Invalid token.");
+        } catch (JOSEException | ParseException e) {
             throw new JwtException(e.getMessage());
         }
 
         if (Objects.isNull(nimbusJwtDecoder)) {
             SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), MacAlgorithm.HS512.name());
-            nimbusJwtDecoder = NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
+            nimbusJwtDecoder = NimbusJwtDecoder.withSecretKey(secretKeySpec)
+                    .macAlgorithm(MacAlgorithm.HS512)
+                    .build();
         }
-        
+
         return nimbusJwtDecoder.decode(token);
     }
-    
 }

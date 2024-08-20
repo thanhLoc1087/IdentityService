@@ -1,5 +1,8 @@
 package com.loc.identity_service.service;
 
+import java.util.HashSet;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.loc.identity_service.dto.request.RoleRequest;
@@ -13,13 +16,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashSet;
-import java.util.List;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RoleService {
     RoleRepository roleRepository;
     PermissionRepository permissionRepository;
@@ -34,11 +34,7 @@ public class RoleService {
     }
 
     public List<RoleResponse> getAll() {
-        return roleRepository
-            .findAll()
-            .stream()
-            .map(roleMapper::toRoleResponse)
-            .toList();
+        return roleRepository.findAll().stream().map(roleMapper::toRoleResponse).toList();
     }
 
     public void delete(String role) {
