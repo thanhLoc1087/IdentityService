@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.loc.identity_service.constant.PredefinedRoles;
 import com.loc.identity_service.entity.Role;
 import com.loc.identity_service.entity.User;
+import com.loc.identity_service.repository.RoleRepository;
 import com.loc.identity_service.repository.UserRepository;
 
 import lombok.AccessLevel;
@@ -39,20 +40,23 @@ public class ApplicationInnitConfig {
     static final String ADMIN_PASSWORD = "admin";
 
     @Bean
-    ApplicationRunner applicationRunner(UserRepository userRepository) {
+    ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
         return args -> {
-            if (userRepository.findByUsername("admin").isEmpty()) {
+            if (userRepository.findByUsername(ADMIN_USER_NAME).isEmpty()) {
+                roleRepository.save(PredefinedRoles.USER);
+                Role adminRole = roleRepository.save(PredefinedRoles.ADMIN);
+
                 var roles = new HashSet<Role>();
-                roles.add(PredefinedRoles.ADMIN);
+                roles.add(adminRole);
 
-                User admin = User.builder()
-                    .username(ADMIN_USER_NAME)
-                    .password(passwordEncoder.encode(ADMIN_PASSWORD))
-                    .roles(roles)
-                    .build();
+                User user = User.builder()
+                        .username(ADMIN_USER_NAME)
+                        .password(passwordEncoder.encode(ADMIN_PASSWORD))
+                        .roles(roles)
+                        .build();
 
-                userRepository.save(admin);
-                log.warn("Admin user has been created with default password: 'admin'. Please change it for security measures.");
+                userRepository.save(user);
+                log.warn("admin user has been created with default password: admin, please change it");
             }
         };
     }
