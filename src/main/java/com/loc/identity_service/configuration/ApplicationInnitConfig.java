@@ -3,6 +3,7 @@ package com.loc.identity_service.configuration;
 import java.util.HashSet;
 
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,11 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @RequiredArgsConstructor
 @FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
+@ConditionalOnProperty(
+    prefix = "spring",
+    value = "datasource.driverClassName",
+    havingValue = "org.postgresql.Driver"
+)
 @Slf4j
 public class ApplicationInnitConfig {
 
