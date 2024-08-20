@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,10 +16,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import com.loc.identity_service.dto.request.UserCreationRequest;
 import com.loc.identity_service.entity.User;
 import com.loc.identity_service.exception.AppException;
+import com.loc.identity_service.mapper.UserMapper;
 import com.loc.identity_service.repository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +35,10 @@ public class UserServiceTest {
     private UserService userService;
 
     @MockBean
-    private UserRepository userRepository;
+    private UserRepository userRepository;    
+    
+    @Autowired
+    UserMapper userMapper;
 
     private UserCreationRequest request;
     private User user;
@@ -87,5 +93,34 @@ public class UserServiceTest {
         
         Assertions.assertThat(exception.getErrorCode().getCode())
             .isEqualTo(1002);
+    }
+
+    @Test
+    @WithMockUser()
+    void getMyInfo_valid_success() {
+        // GIVEN
+        Mockito.when(userRepository.findByUsername(anyString()))
+            .thenReturn(Optional.of(user));
+
+        // WHEN
+        var response = userService.getMyInfo();
+
+        // THEN
+        Assertions.assertThat(response.getUsername()).isEqualTo("johndoe");
+        Assertions.assertThat(response.getId()).isEqualTo("jk31hkj3h5");
+    }
+    
+    @Test
+    @WithMockUser()
+    void getMyInfo_userNotFound_fail() {
+        // GIVEN
+        Mockito.when(userRepository.findByUsername(anyString())).thenReturn(Optional.ofNullable(null));
+
+        // WHEN
+        var exception = assertThrows(AppException.class, 
+            () -> userService.getMyInfo());
+        
+        Assertions.assertThat(exception.getErrorCode().getCode())
+            .isEqualTo(1001);
     }
 }

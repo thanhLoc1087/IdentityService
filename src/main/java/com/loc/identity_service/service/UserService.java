@@ -8,12 +8,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import com.loc.identity_service.constant.PredefinedRoles;
 import com.loc.identity_service.dto.request.UserCreationRequest;
 import com.loc.identity_service.dto.request.UserUpdateRequest;
 import com.loc.identity_service.dto.response.UserResponse;
+import com.loc.identity_service.entity.Role;
 import com.loc.identity_service.entity.User;
 import com.loc.identity_service.exception.AppException;
 import com.loc.identity_service.exception.ErrorCode;
@@ -43,14 +43,10 @@ public class UserService {
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         
-        var roleNames = new HashSet<String>();
-        log.info(roleNames.toString());
-        if (!CollectionUtils.isEmpty(request.getRoles()))
-            roleNames.addAll(request.getRoles());
-        else
-            roleNames.add(PredefinedRoles.USER.getName());
+        var roles = new HashSet<Role>();
+        roles.add(PredefinedRoles.USER);
 
-        user.setRoles(new HashSet<>(roleRepository.findAllById(roleNames)));
+        user.setRoles(roles);
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
