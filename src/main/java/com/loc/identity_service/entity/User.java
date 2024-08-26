@@ -3,6 +3,7 @@ package com.loc.identity_service.entity;
 import java.time.LocalDate;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,7 +32,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @Column(name = "username", unique = true, columnDefinition = "VARCHAR(255) COLLATE utif8mb4_unicode_ci")
     String username;
+
     String password;
     String firstName;
     String lastName;
